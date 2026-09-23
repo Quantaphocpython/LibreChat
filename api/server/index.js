@@ -80,6 +80,7 @@ const { startExpiredFileSweep } = require('./services/Files/process');
 const { checkMigrations } = require('./services/start/migration');
 const optionalJwtAuth = require('./middleware/optionalJwtAuth');
 const initializeMCPs = require('./services/initializeMCPs');
+const { initKeepAlive } = require('./services/keepAlive');
 const { configureSubagentTaskRouting } = require('./services/Endpoints/agents/subagentThreadStore');
 const configureSocialLogins = require('./socialLogins');
 const createSpaFallback = require('./utils/fallback');
@@ -446,6 +447,10 @@ const startServer = async () => {
   app.use('/api/mcp', routes.mcp);
   app.use('/api/rum', routes.rum);
 
+  app.get(['/healthz', '/api/health'], (req, res) => {
+    res.status(200).json({ status: 'ok', serverReady, timestamp: new Date().toISOString() });
+  });
+
   app.use('/metrics', metricsRouter);
 
   app.use('/api', routes.openapi);
@@ -516,6 +521,7 @@ const startServer = async () => {
       }
       serverReady = true;
       logger.info('Server readiness checks passing.');
+      initKeepAlive();
     } catch (initErr) {
       serverReady = false;
       logger.error('Post-listen initialization failed:', initErr);
