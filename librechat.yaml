@@ -1,0 +1,14 @@
+version: 1.3.5
+cache: true
+
+endpoints:
+  custom:
+    - name: "AI Gateway"
+      apiKey: "${LITELLM_MASTER_KEY}"
+      baseURL: "${LITELLM_BASE_URL}"
+      models:
+        default: ["gpt-4o-mini"]
+        fetch: true
+      titleConvo: true
+      titleModel: "gpt-4o-mini"
+      modelDisplayLabel: "AI Gateway (LiteLLM)"
